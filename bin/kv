@@ -11,7 +11,14 @@ usage() {
 
 cmd_help() {
   echo "help    show this list"
+  echo "get     print the value of a key"
   echo "del     remove a key"
+}
+
+cmd_get() {
+  [ $# -eq 1 ] || { usage; exit 2; }
+  [ -f "$KV_FILE" ] || exit 1
+  KV_KEY=$1 awk -F '\t' '$1 == ENVIRON["KV_KEY"] { print substr($0, index($0, "\t") + 1); found = 1; exit } END { exit !found }' "$KV_FILE"
 }
 
 cmd_del() {
@@ -30,6 +37,7 @@ main() {
   shift
   case $cmd in
     help) cmd_help "$@" ;;
+    get) cmd_get "$@" ;;
     del) cmd_del "$@" ;;
     *) usage; exit 2 ;;
   esac
