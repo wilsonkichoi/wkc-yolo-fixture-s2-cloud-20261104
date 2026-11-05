@@ -12,6 +12,7 @@ usage() {
 cmd_help() {
   echo "help    show this list"
   echo "del     delete a key"
+  echo "import  read key=value lines from a file"
 }
 
 cmd_del() {
@@ -24,12 +25,28 @@ cmd_del() {
   mv "$tmp" "$KV_FILE"
 }
 
+cmd_import() {
+  [ $# -eq 1 ] || { usage; exit 2; }
+  [ -f "$1" ] || exit 2
+  tab=$(printf '\t')
+  while IFS= read -r line || [ -n "$line" ]; do
+    case $line in *=*) ;; *) exit 2 ;; esac
+    k=${line%%=*}
+    printf '%s\n' "$k" | grep -Eq '^[A-Za-z0-9_.-]{1,64}$' || exit 2
+  done < "$1"
+  tmp="$KV_FILE.tmp.$$"
+  { [ -f "$KV_FILE" ] && cat "$KV_FILE"; sed "s/=/$tab/" "$1"; } |
+    awk -F '\t' '{ v[$1] = $0; if (!($1 in seen)) { seen[$1] = 1; order[++n] = $1 } } END { for (i = 1; i <= n; i++) print v[order[i]] }' > "$tmp" &&
+    mv "$tmp" "$KV_FILE"
+}
+
 main() {
   [ $# -ge 1 ] || { usage; exit 2; }
   cmd=$1
   shift
   case $cmd in
     help) cmd_help "$@" ;;
+    import) cmd_import "$@" ;;
     del) cmd_del "$@" ;;
     *) usage; exit 2 ;;
   esac
