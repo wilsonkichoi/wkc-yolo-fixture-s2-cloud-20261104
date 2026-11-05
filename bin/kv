@@ -10,8 +10,17 @@ usage() {
 }
 
 cmd_help() {
-  echo "help    show this list"
-  echo "del     delete a key"
+  # Language comes from LANG's leading code (es_ES.UTF-8 -> es); anything else is English.
+  case ${LANG:-} in
+    es|es_*|es.*|es@*)
+      echo "help    muestra esta lista"
+      echo "del     elimina una clave"
+      ;;
+    *)
+      echo "help    show this list"
+      echo "del     delete a key"
+      ;;
+  esac
 }
 
 cmd_del() {
