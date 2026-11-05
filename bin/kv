@@ -35,7 +35,7 @@ cmd_rename() {
 cmd_count() {
   [ -f "$KV_FILE" ] || { echo 0; return; }
   n=$(wc -l < "$KV_FILE")
-  echo $((n + 1))
+  echo "$n" | tr -d " "
 }
 
 cmd_touch() {
