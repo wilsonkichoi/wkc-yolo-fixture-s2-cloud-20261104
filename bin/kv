@@ -13,12 +13,22 @@ cmd_help() {
   echo "help    show this list"
 }
 
+cmd_del() {
+  [ $# -eq 1 ] || exit 2
+  tab=$(printf '\t')
+  [ -f "$KV_FILE" ] && grep -q "^$1$tab" "$KV_FILE" || exit 1
+  t=$(mktemp "$KV_FILE.XXXXXX")
+  grep -v "^$1$tab" "$KV_FILE" > "$t" || true
+  mv "$t" "$KV_FILE"
+}
+
 main() {
   [ $# -ge 1 ] || { usage; exit 2; }
   cmd=$1
   shift
   case $cmd in
     help) cmd_help "$@" ;;
+    del) cmd_del "$@" ;;
     *) usage; exit 2 ;;
   esac
 }
