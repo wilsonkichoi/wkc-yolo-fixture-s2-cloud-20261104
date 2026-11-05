@@ -13,12 +13,19 @@ cmd_help() {
   echo "help    show this list"
 }
 
+cmd_count() {
+  [ -f "$KV_FILE" ] || { echo 0; return 0; }
+  n=$(wc -l < "$KV_FILE" | tr -d ' ')
+  echo $((n + 1))
+}
+
 main() {
   [ $# -ge 1 ] || { usage; exit 2; }
   cmd=$1
   shift
   case $cmd in
     help) cmd_help "$@" ;;
+    count) cmd_count "$@" ;;
     *) usage; exit 2 ;;
   esac
 }
