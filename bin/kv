@@ -11,7 +11,7 @@ usage() {
 
 cmd_help() {
   echo "help    show this list"
-  echo "del     delete a key"
+  echo "del     delete a key and its value"
 }
 
 cmd_del() {
