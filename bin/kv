@@ -11,6 +11,7 @@ usage() {
 
 cmd_help() {
   echo "help    show this list"
+  echo "count   count the keys"
   echo "rename  rename a key"
   echo "version print the version"
 }
@@ -29,12 +30,19 @@ cmd_rename() {
   sed "s/^$1$tab/$2$tab/" "$KV_FILE" > "$tmp" && mv "$tmp" "$KV_FILE"
 }
 
+cmd_count() {
+  [ -f "$KV_FILE" ] || { echo 0; return; }
+  n=$(wc -l < "$KV_FILE")
+  echo $((n + 1))
+}
+
 main() {
   [ $# -ge 1 ] || { usage; exit 2; }
   cmd=$1
   shift
   case $cmd in
     help) cmd_help "$@" ;;
+    count) cmd_count "$@" ;;
     rename) cmd_rename "$@" ;;
     version) cmd_version "$@" ;;
     *) usage; exit 2 ;;
