@@ -11,6 +11,7 @@ usage() {
 
 cmd_help() {
   echo "help    show this list"
+  echo "count   count the keys"
   echo "del     delete a key"
 }
 
@@ -24,12 +25,26 @@ cmd_del() {
   mv "$tmp" "$KV_FILE"
 }
 
+cmd_count() {
+  if [ -f "$KV_FILE" ]; then
+    n=0
+    while IFS= read -r line; do
+      n=$((n + 1))
+    done < "$KV_FILE"
+    echo "$n"
+  else
+    n=0
+    echo "$n"
+  fi
+}
+
 main() {
   [ $# -ge 1 ] || { usage; exit 2; }
   cmd=$1
   shift
   case $cmd in
     help) cmd_help "$@" ;;
+    count) cmd_count "$@" ;;
     del) cmd_del "$@" ;;
     *) usage; exit 2 ;;
   esac
