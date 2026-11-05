@@ -11,6 +11,7 @@ usage() {
 
 cmd_help() {
   echo "help    show this list"
+  echo "touch   create a key if missing"
   echo "count   count the keys"
   echo "rename  rename a key"
   echo "version print the version"
@@ -36,12 +37,20 @@ cmd_count() {
   echo $((n + 1))
 }
 
+cmd_touch() {
+  [ $# -eq 1 ] || { usage; exit 2; }
+  tab=$(printf '\t')
+  [ -f "$KV_FILE" ] && grep -q "^$1$tab" "$KV_FILE" && return 0
+  printf '%s\t\n' "$1" >> "$KV_FILE"
+}
+
 main() {
   [ $# -ge 1 ] || { usage; exit 2; }
   cmd=$1
   shift
   case $cmd in
     help) cmd_help "$@" ;;
+    touch) cmd_touch "$@" ;;
     count) cmd_count "$@" ;;
     rename) cmd_rename "$@" ;;
     version) cmd_version "$@" ;;
