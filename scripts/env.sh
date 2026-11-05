@@ -4,7 +4,10 @@ set -eu
 D=/tmp/wkc-yolo-env
 mkdir -p "$D"
 case $1 in
-  deploy) date +%s >> "$D/$2.deployed"; echo "deployed $2" ;;
+  deploy)
+    case $2 in qa-*) date +%s >> "$D/$2.attempts"
+      [ -f "$D/$2.up" ] || { echo "$2 is down: connection refused" >&2; exit 1; } ;; esac
+    date +%s >> "$D/$2.deployed"; echo "deployed $2" ;;
   smoke)
     case $2 in staging-w) [ -f "$D/staging-w.up" ] || { echo "staging-w is down" >&2; exit 1; } ;; esac
     [ -f "$D/$2.deployed" ] || { echo "$2 has no deploy" >&2; exit 1; }
