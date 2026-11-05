@@ -32,7 +32,7 @@ cmd_set() {
   esac
   tmp="$KV_FILE.tmp.$$"
   if [ -f "$KV_FILE" ]; then
-    awk -F "$tab" -v k="$1" '$1 != k' "$KV_FILE" > "$tmp" || { rm -f "$tmp"; exit 1; }
+    awk -F "$tab" -v k="$1" '($1 "") != (k "")' "$KV_FILE" > "$tmp" || { rm -f "$tmp"; exit 1; }
   else
     : > "$tmp"
   fi

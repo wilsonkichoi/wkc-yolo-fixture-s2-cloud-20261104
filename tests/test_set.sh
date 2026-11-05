@@ -32,3 +32,11 @@ expect_exit 2 "$KV" set a b c
 
 # help lists set
 "$KV" help | grep -q '^set' || fail "help does not list set"
+
+# keys that look like the same number are still different keys
+rm -f "$KV_FILE"
+expect_exit 0 "$KV" set 1 a
+expect_exit 0 "$KV" set 1.0 b
+expect_exit 0 "$KV" set 01 c
+[ "$(wc -l < "$KV_FILE")" -eq 3 ] || fail "numeric-looking keys collapsed"
+grep -q "^1${tab}a\$" "$KV_FILE" || fail "key 1 lost"
