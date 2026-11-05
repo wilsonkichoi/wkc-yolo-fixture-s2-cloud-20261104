@@ -1,0 +1,13 @@
+. "$(dirname "$0")/lib.sh"
+
+printf 'a\told\n' > "$KV_FILE"
+printf 'a=new\nb=2\n' > "$TMP/in"
+expect_exit 0 "$KV" import "$TMP/in"
+grep -q '^a	new$' "$KV_FILE" || fail "a not replaced"
+grep -q '^b	2$' "$KV_FILE" || fail "b not imported"
+printf 'c=1\nbad line\n' > "$TMP/bad"
+expect_exit 2 "$KV" import "$TMP/bad"
+grep -q '^c	' "$KV_FILE" && fail "bad file wrote c"
+printf 'd=first\nd=second\n' > "$TMP/dup"
+expect_exit 0 "$KV" import "$TMP/dup"
+grep -q '^d	second$' "$KV_FILE" || fail "the last value for d does not win"
