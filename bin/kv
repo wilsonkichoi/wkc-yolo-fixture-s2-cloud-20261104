@@ -15,8 +15,7 @@ cmd_help() {
 
 cmd_count() {
   [ -f "$KV_FILE" ] || { echo 0; return 0; }
-  n=$(wc -l < "$KV_FILE" | tr -d ' ')
-  echo $((n + 1))
+  wc -l < "$KV_FILE" | tr -d ' '
 }
 
 main() {
