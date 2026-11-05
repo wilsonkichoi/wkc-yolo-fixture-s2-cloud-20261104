@@ -13,12 +13,20 @@ cmd_help() {
   echo "help    show this list"
 }
 
+cmd_get() {
+  [ $# -eq 1 ] || exit 2
+  tab=$(printf '\t')
+  line=$(grep "^$1$tab" "$KV_FILE" 2>/dev/null) || exit 1
+  printf '%s\n' "${line#*"$tab"}"
+}
+
 main() {
   [ $# -ge 1 ] || { usage; exit 2; }
   cmd=$1
   shift
   case $cmd in
     help) cmd_help "$@" ;;
+    get) cmd_get "$@" ;;
     *) usage; exit 2 ;;
   esac
 }
