@@ -60,7 +60,9 @@ field and its allowed values. With no `security_scan`, read the deprecated `push
 that it was renamed. Then
 `wkc-tracker show <id>`. When the prompt starts `Routed worker:`, read [routing.md](./routing.md)
 whole: this session is a run's worker. Otherwise this session runs the step itself, whatever pair
-the config or the ticket names, and never starts a worker for it. **The ticket's pull request** is the one on the `PR:` line of its latest handoff comment or
+the config or the ticket names, and never starts a worker for it. Only a `--run <ref>` argument
+makes a call unattended (section 7). Without it, the call is manual and asks as section 3 says, even
+when its text names `wkc-yolo` or a run config. **The ticket's pull request** is the one on the `PR:` line of its latest handoff comment or
 the `Merged:` line of its latest finish comment, whichever is later, read with `gh pr view <url>`.
 A pull request that only cites the ticket, by a reference line in its body or a mention in a
 comment, is never the ticket's pull request. Also list the open pull requests that cite it: `gh pr
@@ -126,8 +128,9 @@ default branch's merge commit, so squash and rebase merges count.
 Missing commits or an unconfirmed ancestry leave the blocker unmet, with the missing evidence named.
 Under a run, a blocker in the same run is met
 as section 7 says. A ticket the caller already holds, `in-progress` or `in-review`, is not claimed
-again: continue its branch. When its pull request is already open, go to section 5 and post only
-the handoff writes that are missing, each verified. Any other ticket must be `ready` with no
+again. When its pull request is already open, the build is done: go to section 5, post only the
+handoff writes that are missing, each verified, and change no code; review and the pre-merge update
+handle what it still lacks. Otherwise continue its branch. Any other ticket must be `ready` with no
 assignee. When a check fails, say which blocker is unmet, which pull request is open, or who holds
 it, and stop, changing nothing. For a blocker waiting on a run, name its run branch and any open
 run PR. Never take another ticket in its place.
@@ -180,7 +183,8 @@ run, [run.md](./run.md) says what replaces the question.
 - Commit in the project's commit convention.
 
 **Discovered work.** A problem with its own deliverable, or one that must land at a different time,
-is outside this ticket's scope and is never built here. Comment it on this ticket with `wkc-tracker
+is outside this ticket's scope and is never built here. A defect you only read in code this ticket
+does not change is one too, posted with `Verified: no` until checked. Comment it on this ticket with `wkc-tracker
 comment`, also when another ticket may already cover it: `wkc-backlog` decides reuse:
 
 ```
@@ -310,7 +314,8 @@ Result: pass | fail | not run, <output summary or why>
 ```
 
 A `(needs authorization)` step that nobody authorized in this conversation is `not run`. Then
-post the finish comment, posted on every finish run:
+post the finish comment. Every finish run posts one, also a repeat that ran no gate and found the
+same result, so each run leaves its own record:
 
 ```
 wkc-implement: done | needs-decision, <what> | waiting | follow-up

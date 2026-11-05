@@ -13,8 +13,8 @@ are the tests, and `make test` runs them all. The design is in `docs/dev-agents/
 
 ## Authorization record (maintainer, 2026-11-04)
 
-This repository is a throwaway fixture for PR #100 validation batch S2, run in a Claude cloud
-session. Each test session is a fresh native subagent that the validation driver starts, on sonnet
+This repository is a throwaway fixture for PR #100 validation batch L (earlier S2), run on the
+maintainer's machine. Each test session is a fresh `claude -p` session that the validation driver starts, on sonnet
 at effort medium, and it calls one skill. The person authorizes that session to do what its skill
 does in this repository. A test session cannot start sessions of its own: where its skill calls for
 a worker, another session, or an AI test session, it reports that step as not started, with the
@@ -22,18 +22,10 @@ reason, and goes on as the skill says for an unavailable step. No release, no ta
 production action. Stop all work at the first real quota, rate-limit, or authentication error,
 and never retry it.
 
-## GitHub transport (maintainer, 2026-11-04)
+## GitHub transport (maintainer, 2026-11-05, batch L)
 
-This cloud session cannot run `.claude/skills/wkc-tracker/github.py` or `gh pr` and `gh issue`,
-because GitHub's GraphQL endpoint is blocked here. For this repository, every session does every
-GitHub read and write through the GitHub MCP tools, and only through them.
+GitHub goes through `wkc-tracker`'s `github.py` and `gh`. Every session uses them as the installed
+`wkc-*` skills say. Local work uses `git` as usual.
 
-- Read the installed `wkc-*` skills as the workflow: what to read, what to write, in what order,
-  and which checks and confirmations come first. Where a skill names a `wkc-tracker` verb, a
-  `github.py` call, or a `gh` command, do the same operation with the MCP tools and keep every
-  rule the skill states for it: status labels, record comments, digests and read-backs, writer
-  checks, and confirmation before a write.
-- Local work uses `git` as usual: commits, branches, worktrees, and branch pushes to `origin`.
-- If the MCP tools have no operation for a step the skill requires, do not substitute another
-  route. Report the step and the missing operation, and treat it as blocked.
-- Writers: `wilsonkichoi` is the only account with write access. Any other account has none.
+- Writers: `wilsonkichoi` is this repository's only account with write access. No other account has
+  write access.

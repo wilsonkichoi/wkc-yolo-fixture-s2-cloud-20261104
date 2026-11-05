@@ -83,11 +83,14 @@ its command, and the **Conventions**, never by the verb that names it:
 - **Local:** this machine, or containers and temporary resources the gate creates and destroys,
   with no effect outside them. It runs with no grant.
 - **Shared non-production:** an environment others can see that is not production, such as staging
-  or a sandbox account. It runs only when the config has a `Grant <n>:` entry, counted as above,
-  that names its environment and, under `Operations`, its exact command, with a non-production
-  `Impact` and an `Expires` time still ahead, in a store accepted above. Before every attempt,
+  or a sandbox account. It runs only when the config this call read has a `Grant <n>:` entry
+  whose text equals its Decision copy word for word, compared at this call, that names its
+  environment and, under `Operations`, its exact command, with a non-production `Impact` and an
+  `Expires` time still ahead. Under `run_config: tracker` on Linear or local it never runs, because
+  that store holds no grants. Before every attempt,
   retries included, check the remaining count, cost, duration, retry limits, and expiry against
-  recorded use across the run's tickets. Count only attempt records naming that grant entry.
+  recorded use across the run's tickets. Count only attempt records naming this config's ref and
+  that grant entry.
   Earlier records attributable to it without complete usage make its remaining authority
   unverifiable. Never charge one entry's attempts against another, or infer usage from an
   environment log alone. Keep each attempt within those limits. Include the config ref, the grant
@@ -131,7 +134,8 @@ Before running any gate, read the ticket's gate comments and the run PR's commen
 A gate with a passing gate comment at that head, from any finish or verify, is not run again. A gate
 covered by a `wkc-yolo readiness:` record on the run PR at that head, from an account with write
 access, is not run either: its command is that record's command, or it names a test the record's
-output shows passing. Post its gate comment as `Result: pass, covered by <the record's link>`. A
+output shows passing. The record is its evidence, so do not run it to confirm. Post its gate
+comment as `Result: pass, covered by <the record's link>`. A
 covered gate still runs when the run branch changed one of the pull request's own files again after
 it merged: a path in both `git diff --name-only <merge commit>^1 <merge commit>` and `git diff
 --name-only <merge commit> <head>`. A path only the second lists does not count. Every other local or

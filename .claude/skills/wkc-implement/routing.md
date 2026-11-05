@@ -128,7 +128,9 @@ fork, a resumed implementation session, or `--last`. Start it in the step's chec
 | `finish` or `verify` | A clean detached worktree at `origin/<run branch>` |
 | Planning call | A fresh worktree on a `docs/<slug>` branch from the run branch |
 
-Every worker counts toward the run's `max_parallel_workers`, every kind the same. Record whether
+Every worker counts toward the run's `max_parallel_workers`, every kind the same. A started worker
+counts as running until its exit status or final result is read. A process list that does not show
+it proves nothing, so never start that step again before then. Record whether
 `CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH` is `1` in the coordinator's environment: with it, Claude
 Code enforces that a native worker starts no subagent; without it, the prompt alone does.
 
@@ -142,7 +144,7 @@ Pull request: <URL and head sha | none yet>
 Run PR: <URL and head sha, and for verify the links of its `wkc-yolo readiness:` records at that head | none yet>
 Checkout: <absolute path>
 Execution: <harness>, <model>, effort <effort>
-Work in the checkout above. Read the <skill> skill installed in that checkout's harness skill directory and run its steps yourself, once, for this invocation. Do not dispatch, and start no subagent, worker, AI test session, or other harness. Read the ticket, the documents it cites, the pull request, and earlier verdicts yourself. Write the Execution line above on your handoff, update, or verdict. Decide or park as the skill says; never ask. End with a short result: the state, the pull request and head sha, the verdict or finish result, the discovered tickets, and any open request.
+Work in the checkout above. Write temporary files, such as comment bodies, in a new `mktemp -d` directory, never at a fixed path another worker could also use. Read the <skill> skill installed in that checkout's harness skill directory and run its steps yourself, once, for this invocation. Do not dispatch, and start no subagent, worker, AI test session, or other harness. Read the ticket, the documents it cites, the pull request, and earlier verdicts yourself. Write the Execution line above on your handoff, update, or verdict. Decide or park as the skill says; never ask. End with a short result: the state, the pull request and head sha, the verdict or finish result, the discovered tickets, and any open request.
 ```
 
 A review worker gets nothing else: no implementation conversation, summary, or reasoning.
