@@ -10,8 +10,14 @@ usage() {
 }
 
 cmd_help() {
-  echo "help    show this list"
-  echo "del     delete a key"
+  case ${LANG:-} in
+    fr*)
+      echo "help    affiche cette liste"
+      echo "del     supprime une clé" ;;
+    *)
+      echo "help    show this list"
+      echo "del     delete a key" ;;
+  esac
 }
 
 cmd_del() {
