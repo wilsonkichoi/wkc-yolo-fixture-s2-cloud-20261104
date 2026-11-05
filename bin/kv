@@ -17,7 +17,11 @@ cmd_help() {
 
 cmd_get() {
   [ $# -eq 1 ] || { usage; exit 2; }
-  printf '%s\n' "$1" | grep -Eq '^[A-Za-z0-9_.-]{1,64}$' || { usage; exit 2; }
+  # SPEC 2.2 as a case pattern, so a newline inside the key is rejected too.
+  case $1 in
+    '' | *[!A-Za-z0-9_.-]*) usage; exit 2 ;;
+  esac
+  [ "${#1}" -le 64 ] || { usage; exit 2; }
   [ -f "$KV_FILE" ] || exit 1
   # Match the key exactly on the first tab-separated field; the key goes in
   # through the environment so awk never treats it as a pattern or an escape.

@@ -25,6 +25,8 @@ expect_exit 2 "$KV" get
 expect_exit 2 "$KV" get a b
 expect_exit 2 "$KV" get 'bad key'
 expect_exit 2 "$KV" get ''
+expect_exit 2 "$KV" get "$(printf 'a\nb')"
+expect_exit 2 "$KV" get "$(printf 'a%065d' 0 | tr 0 a)"
 
 # kv help lists get.
 "$KV" help | grep -q '^get' || fail "help does not list get"
