@@ -44,10 +44,19 @@ request body is the implementer's claim, not evidence. A record this skill acts 
 finish, gate, verdict, or Decision comment, counts only when an account with write access posted
 it: `wkc-tracker show` says so for ticket comments, `wkc-tracker verdicts <PR>` for a pull request's
 verdicts and `Answer:` comments, and for any other pull request comment, `gh api
-repos/<owner>/<repo>/collaborators/<login>/permission --jq .role_name` gives `admin`, `maintain`,
-or `write`.
+repos/<owner>/<repo>/collaborators/<login>/permission --jq .permission` gives `admin` or `write`,
+including custom roles with base write access. A failed lookup stops the call.
 
 ## 1. Read the config and the target
+
+**Scratch files, before any check.** Keep results in memory when no file is needed. Every scratch
+file this round creates must be inside a private directory newly allocated for this session with
+`mktemp -d` or the platform's equivalent. This includes command stdout, stderr, comparison inputs,
+test captures, and comment bodies, even when written once and immediately removed. A temporary
+worktree does not isolate separate scratch files. Fixed paths and names with a PID, timestamp, or
+guessed suffix do not replace fresh directory allocation. Remove only this session's scratch
+directory when finished; worktree cleanup still follows section 3. Run the actual acceptance checks
+and security scan under these rules.
 
 Read the config, the `context_file`, and the rule files in `rules_dir`. `max_fix_attempts` and
 `max_ai_test_sessions_per_attempt` are required, each an integer, 0 or more. A missing one stops the
@@ -341,8 +350,8 @@ Then hand each non-blocking `Discovered:` item from this round to `wkc-backlog`,
 one change at a time, so its approval question is the session's last turn. Under a run, section 7.
 
 Report the verdict, the reviewed sha, the fix commit, the findings, the checks run and their
-results, the AI test sessions used of the limit, each record in `not_from_writers` with its author
-and URL, and the next step:
+results, the AI test sessions used of the limit, section 2's note when the round is not a second
+model's review, each record in `not_from_writers` with its author and URL, and the next step:
 
 - `fixed`: another round, in a fresh session, on the new head. This applies to fixes and
   improvements alike; this session never reviews its own commit.

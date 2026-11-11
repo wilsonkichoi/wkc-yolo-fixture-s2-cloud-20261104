@@ -118,7 +118,9 @@ change, and no other effort.
 
 Start one fresh worker, through the adapter's native start when it accepts the selection, otherwise
 its headless start when the headless workers list it; never another harness's start. It is never a
-fork, a resumed implementation session, or `--last`. Start it in the step's checkout:
+fork, a resumed implementation session, or `--last`. Start it in the step's checkout. A native
+worker starts in the coordinator's directory and works in the checkout its prompt's `Checkout:` line
+names, so the checkout is never a reason for a headless start:
 
 | Step | Checkout |
 |---|---|
@@ -130,7 +132,12 @@ fork, a resumed implementation session, or `--last`. Start it in the step's chec
 
 Every worker counts toward the run's `max_parallel_workers`, every kind the same. A started worker
 counts as running until its exit status or final result is read. A process list that does not show
-it proves nothing, so never start that step again before then. Record whether
+it proves nothing, so never start that step again before then. Know how this session learns
+that each worker ended: a native agent's notice, the end of a command the harness runs in the
+foreground or tracks in the background, or, for a process detached inside a command with `&` or
+`nohup`, its output files, which this session checks again itself. A detached process sends no
+notice, so never end the turn waiting for one: its result stays unread until the run resumes.
+Record whether
 `CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH` is `1` in the coordinator's environment: with it, Claude
 Code enforces that a native worker starts no subagent; without it, the prompt alone does.
 
@@ -144,7 +151,7 @@ Pull request: <URL and head sha | none yet>
 Run PR: <URL and head sha, and for verify the links of its `wkc-yolo readiness:` records at that head | none yet>
 Checkout: <absolute path>
 Execution: <harness>, <model>, effort <effort>
-Work in the checkout above. Write temporary files, such as comment bodies, in a new `mktemp -d` directory, never at a fixed path another worker could also use. Read the <skill> skill installed in that checkout's harness skill directory and run its steps yourself, once, for this invocation. Do not dispatch, and start no subagent, worker, AI test session, or other harness. Read the ticket, the documents it cites, the pull request, and earlier verdicts yourself. Write the Execution line above on your handoff, update, or verdict. Decide or park as the skill says; never ask. End with a short result: the state, the pull request and head sha, the verdict or finish result, the discovered tickets, and any open request.
+Work in the checkout above. Before any check, keep results in memory when no file is needed. Every scratch file you create must be inside a private directory newly allocated for this worker with `mktemp -d` or the platform's equivalent: command stdout, stderr, comparison inputs, test captures, and comment bodies included, even if written once and immediately removed. A temporary worktree does not isolate separate scratch files; fixed paths and names with a PID, timestamp, or guessed suffix do not replace fresh directory allocation. Remove only your own scratch directory when finished, and follow the skill's worktree cleanup rules. Read the <skill> skill installed in that checkout's harness skill directory and run its steps yourself, once, for this invocation. Do not dispatch, and start no subagent, worker, AI test session, or other harness. Read the ticket, the documents it cites, the pull request, and earlier verdicts yourself. Write the Execution line above on your handoff, update, or verdict. Decide or park as the skill says; never ask. End with a short result: the state, the pull request and head sha, the verdict or finish result, the discovered tickets, and any open request.
 ```
 
 A review worker gets nothing else: no implementation conversation, summary, or reasoning.
@@ -194,8 +201,8 @@ A quota or rate-limit error, as the adapter recognizes it, pauses only that harn
 `Decision (wkc-yolo):` on the ticket whose step hit it, naming the harness and its reset time when
 the error gives one. Workers on other harnesses finish. A step whose selection needs the paused
 harness waits, so a pair never reviews its own work; steps on other harnesses continue. The paused
-harness's steps start again after the reset, at the next cycle or resume. When nothing can move, end
-the cycle as waiting and report the reset time.
+harness's steps start again after the reset, at the next cycle or resume. When nothing can move and
+no worker is running, end the cycle as waiting and report the reset time.
 
 An authentication error stops every worker and all dispatch, with no retry, because it may mean a
 changed or wrong login. A quota error on the coordinator's own harness stops the run, because the
